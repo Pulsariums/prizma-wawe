@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prizma Wawe · Dosya modu</title>
+<style>
+:root{color-scheme:light dark;--bg:#fafafa;--card:#fff;--fg:#1a1a1a;--mut:#6b6b6b;--ln:#dcdcdc;--ac:#1a73e8;--acfg:#fff;--in:#8a8a8a;--ok:#2e9e5b;--bad:#c5372c}
+@media(prefers-color-scheme:dark){:root{--bg:#161616;--card:#1e1e1e;--fg:#eee;--mut:#a0a0a0;--ln:#363636;--ac:#8ab4f8;--acfg:#10243f;--in:#8a8a8a;--ok:#5bc489;--bad:#f28b82}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:20px;margin:0 0 4px}
+.sub{color:var(--mut);margin:0 0 20px}
+section{background:var(--card);border:1px solid var(--ln);border-radius:8px;padding:16px;margin-bottom:12px}
+h2{font-size:13px;font-weight:600;color:var(--mut);margin:0 0 10px;text-transform:uppercase;letter-spacing:.04em}
+button,select{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--ln);border-radius:6px;padding:8px 14px;cursor:pointer;min-height:38px}
+button:hover:not(:disabled){border-color:var(--mut)}
+button:disabled{opacity:.45;cursor:default}
+button.pri{background:var(--ac);color:var(--acfg);border-color:var(--ac);font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grow{flex:1 1 220px;min-width:0}
+.txt{color:var(--mut);overflow-wrap:anywhere}
+.bar{height:8px;background:var(--ln);border-radius:4px;overflow:hidden;margin:10px 0 6px}
+.bar>i{display:block;height:100%;width:0;background:var(--ac)}
+.seg{display:inline-flex;border:1px solid var(--ln);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-radius:0;min-width:120px}
+.seg button.on{background:var(--ac);color:var(--acfg);font-weight:600}
+input[type=range]{width:100%;margin:10px 0 4px;accent-color:var(--ac)}
+.time{display:flex;justify-content:space-between;color:var(--mut);font-variant-numeric:tabular-nums;font-size:13px}
+canvas{display:block;width:100%;height:200px;border:1px solid var(--ln);border-radius:6px}
+.leg{display:flex;flex-wrap:wrap;gap:16px;color:var(--mut);font-size:13px;margin-top:8px}
+.leg i{display:inline-block;width:12px;height:3px;margin-right:6px;vertical-align:middle}
+#err{color:var(--bad);min-height:1.5em}
+.hide{display:none}
+.drop{border:1px dashed var(--ln);border-radius:6px;padding:14px;text-align:center;color:var(--mut)}
+.drop.over{border-color:var(--ac);color:var(--fg)}
+.nt{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;margin-top:10px}.nt th,.nt td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--ln)}.nt th{color:var(--mut);font-weight:500;font-size:12px}#nums{overflow-x:auto}
+</style></head>
+<body><main>
+<h1>Prizma Wawe</h1>
+<p class="sub">Dosya modu: sıkıştırılmış müziği yükle, kaybolan yüksek frekansları geri getir, önce/sonra karşılaştır. Her şey bu bilgisayarda çalışır, dosya dışarı çıkmaz.</p>
+
+<section>
+  <h2>1 · Model</h2>
+  <div class="row"><span id="mstat" class="txt grow">Hazırlanıyor…</span><button id="mfile" class="hide">Model dosyası seç</button></div>
+  <div class="bar" id="mbarw"><i id="mbar"></i></div>
+  <input type="file" id="mpick" accept=".onnx" class="hide">
+</section>
+
+<section>
+  <h2>2 · Müzik dosyası</h2>
+  <div class="drop" id="drop">Dosyayı buraya bırak ya da aşağıdan seç</div>
+  <div class="row" style="margin-top:10px">
+    <button id="pick">Müzik dosyası seç</button>
+    <span id="fname" class="txt grow">Dosya seçilmedi</span>
+  </div>
+  <input type="file" id="fpick" accept="audio/*,.m4a,.aac,.mp3,.ogg,.opus,.flac,.wav" class="hide">
+  <div class="row" style="margin-top:10px">
+    <label class="txt" for="codec">Dosyanın kodeği:</label>
+    <select id="codec">
+      <option value="0">AAC 128 kbps (YouTube, Spotify ücretsiz)</option>
+      <option value="1">AAC 96 kbps</option>
+      <option value="2">Opus 160 kbps</option>
+      <option value="3">Opus 128 kbps (YouTube)</option>
+      <option value="4">Opus 96 kbps</option>
+      <option value="5">Opus 64 kbps</option>
+      <option value="6">MP3 128 kbps</option>
+      <option value="7">MP3 192 kbps</option>
+    </select>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <label class="txt" for="st0">Başlangıç (sn):</label>
+    <input type="number" id="st0" min="0" step="1" value="0" style="width:80px">
+    <label class="txt" for="len0">Süre (sn):</label>
+    <input type="number" id="len0" min="5" step="1" value="0" style="width:80px">
+    <button id="r30" type="button">30 sn</button><button id="rall" type="button">Hepsi</button>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <label class="txt" for="gain">Abartma:</label>
+    <input type="range" id="gain" min="1" max="2.5" step="0.05" value="1.25" style="flex:1">
+    <span id="gv" class="txt" style="min-width:40px">×1,25</span>
+  </div>
+  <p class="txt">Abartma modeli kandırıp kaybolan frekansları daha güçlü geri getirir; yüksekte ses sertleşebilir. Kodeki daha düşük bit hızı seçmek de benzer etki yapar.</p>
+</section>
+
+<section>
+  <h2>3 · İyileştir</h2>
+  <div class="row"><button id="go" class="pri" disabled>İyileştir</button><button id="stop" class="hide">İptal</button><span id="pstat" class="txt grow"></span></div>
+  <div class="bar"><i id="pbar"></i></div>
+  <div id="err"></div>
+</section>
+
+<section id="res" class="hide">
+  <h2>4 · Sonuç</h2>
+  <div class="row">
+    <button id="play" class="pri" style="min-width:96px">Çal</button>
+    <div class="seg" role="group" aria-label="Kaynak">
+      <button id="bo">Orijinal</button><button id="bp" class="on">İyileştirilmiş</button>
+    </div>
+    <button id="dl">WAV indir</button>
+  </div>
+  <div class="row">
+    <label class="txt"><input type="checkbox" id="en"> Enhancer (stereo, sıcaklık, hava)</label>
+  </div>
+  <details id="adv" style="margin:6px 0 10px"><summary class="txt" style="cursor:pointer">Gelişmiş ayarlar</summary>
+    <div class="row" style="margin-top:8px"><label class="txt" for="en_w" style="width:130px">Stereo genişlik</label><input type="range" id="en_w" min="0.8" max="1.8" step="0.05" value="1.2" style="flex:1"><span id="en_wv" class="txt" style="min-width:48px">×1,20</span></div>
+    <div class="row"><label class="txt" for="en_m" style="width:130px">Sıcaklık (200 Hz)</label><input type="range" id="en_m" min="-3" max="4" step="0.5" value="1" style="flex:1"><span id="en_mv" class="txt" style="min-width:48px">+1,0 dB</span></div>
+    <div class="row"><label class="txt" for="en_a" style="width:130px">Hava (10 kHz)</label><input type="range" id="en_a" min="0" max="6" step="0.5" value="1.5" style="flex:1"><span id="en_av" class="txt" style="min-width:48px">+1,5 dB</span></div>
+  </details>
+  <input type="range" id="seek" min="0" max="1000" value="0" aria-label="Konum">
+  <div class="time"><span id="tcur">0:00</span><span id="ttot">0:00</span></div>
+  <canvas id="cv" width="1400" height="400"></canvas>
+  <div id="nums" class="txt"></div>
+  <div class="leg"><span><i style="background:var(--in)"></i>Orijinal dosya</span><span><i style="background:var(--ac)"></i>İyileştirilmiş</span><span>Kesikli çizgi: 12 kHz</span></div>
+</section>
+</main>
+<script type="module" src="studio.js"></script>
+</body></html>
