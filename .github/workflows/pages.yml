@@ -1,0 +1,46 @@
+name: Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Siteyi hazırla
+        run: |
+          mkdir -p _site/model _site/ort t/ort t/coi
+          npm pack onnxruntime-web@1.20.1 --silent
+          npm pack coi-serviceworker@0.1.7 --silent
+          tar xzf onnxruntime-web-1.20.1.tgz -C t/ort
+          tar xzf coi-serviceworker-0.1.7.tgz -C t/coi
+          O=t/ort/package/dist
+          cp $O/ort-wasm-simd-threaded.mjs $O/ort-wasm-simd-threaded.wasm $O/ort.wasm.min.mjs _site/ort/
+          cp t/coi/package/coi-serviceworker.js _site/
+          sed 's#<title>#<script src="coi-serviceworker.js"></script>\n<title>#' extension/studio.html > _site/index.html
+          cp extension/studio.js extension/worker.js extension/dsp.js extension/engine.js _site/
+          pip install gdown
+          gdown 1yntxu19wKO2xclb_mWVAWxn7x6qnKRjO -O _site/model/bwe_core.onnx
+          test "$(stat -c %s _site/model/bwe_core.onnx)" -eq 2896578
+          mkdir -p eb && cp -r extension/. eb/ && mkdir -p eb/ort && cp _site/ort/* eb/ort/
+          (cd eb && zip -qr ../_site/prizma-wawe-extension.zip .)
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.d.outputs.page_url }}
+    steps:
+      - id: d
+        uses: actions/deploy-pages@v4

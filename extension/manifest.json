@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Prizma Wawe",
+  "version": "0.3.2",
+  "description": "Sekmede çalan sıkıştırılmış müziğin kayıp yüksek frekanslarını geri getirir. Dosya modu: müzik dosyası yükle, iyileştir, önce/sonra dinle.",
+  "permissions": [
+    "tabCapture",
+    "offscreen",
+    "activeTab"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Prizma Wawe"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "cross_origin_embedder_policy": {
+    "value": "require-corp"
+  },
+  "cross_origin_opener_policy": {
+    "value": "same-origin"
+  },
+  "web_accessible_resources": [],
+  "host_permissions": [
+    "https://drive.google.com/*",
+    "https://*.googleusercontent.com/*",
+    "https://drive.usercontent.google.com/*"
+  ]
+}
