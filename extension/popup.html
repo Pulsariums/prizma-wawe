@@ -1,0 +1,31 @@
+<!doctype html><meta charset="utf-8">
+<style>
+:root{color-scheme:light dark;--bg:#fff;--fg:#1a1a1a;--mut:#666;--ln:#d8d8d8;--ac:#1a73e8;--in:#8a8a8a}
+@media(prefers-color-scheme:dark){:root{--bg:#1e1e1e;--fg:#eee;--mut:#9a9a9a;--ln:#3a3a3a;--ac:#8ab4f8;--in:#8a8a8a}}
+body{margin:0;width:340px;padding:14px;background:var(--bg);color:var(--fg);font:14px system-ui,sans-serif}
+h1{font-size:15px;margin:0 0 10px}
+#state{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-weight:600}
+#dot{width:10px;height:10px;border-radius:50%;background:#9a9a9a}
+#dot.on{background:#2e9e5b}
+button{width:100%;padding:9px;border:1px solid var(--ln);background:transparent;color:var(--fg);border-radius:6px;font:inherit;cursor:pointer;margin-bottom:8px}
+button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+canvas{width:100%;height:120px;border:1px solid var(--ln);border-radius:6px;display:block;margin:4px 0 6px}
+.leg{display:flex;gap:14px;font-size:12px;color:var(--mut);margin-bottom:6px}
+.leg i{display:inline-block;width:10px;height:3px;margin-right:5px;vertical-align:middle}
+#info{font-size:13px;line-height:1.6}
+#st{color:var(--mut);font-size:12px;line-height:1.5;white-space:pre-line;margin-top:6px}
+.sel{display:flex;align-items:center;gap:10px;margin-bottom:8px}.sel label{width:50px;color:var(--mut);font-size:13px}.sel select{flex:1;padding:7px;border:1px solid var(--ln);background:transparent;color:var(--fg);border-radius:6px;font:inherit}.sel select:disabled{opacity:.5}
+</style>
+<h1>Prizma Wawe</h1>
+<button id="studio">Dosya modu: müzik dosyası yükle ve iyileştir</button>
+<div id="state"><span id="dot"></span><span id="stt">Kapalı</span></div>
+<div class="sel"><label for="mode">Model</label><select id="mode"><option value="old">Anlık (eski model)</option><option value="new">Yeni model (gecikmeli, ~5 sn)</option></select></div>
+<div class="sel" id="cw" hidden><label for="codec">Kodek</label><select id="codec"><option value="0">AAC 128</option><option value="1">AAC 96</option><option value="2">Opus 160</option><option value="3">Opus 128</option><option value="4">Opus 96</option><option value="5">Opus 64</option><option value="6">MP3 128</option><option value="7">MP3 192</option></select></div>
+<div class="sel" id="gw" hidden><label for="gain">Abartma</label><input type="range" id="gain" min="1" max="2.5" step="0.05" value="1.25" style="flex:1"><span id="gv" style="min-width:36px;font-size:13px">×1,25</span></div>
+<button id="run">Bu sekmede başlat</button>
+<button id="ab" disabled>Orijinal sese geç</button>
+<canvas id="cv" width="624" height="240"></canvas>
+<div class="leg"><span><i style="background:var(--in)"></i>Giriş (YouTube)</span><span><i style="background:var(--ac)"></i>Çıkış (işlenmiş)</span><span>┆ 12 kHz</span></div>
+<div id="info">Kapalıyken veri yok.</div>
+<div id="st"></div>
+<script src="popup.js"></script>
